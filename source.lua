@@ -46,6 +46,7 @@ end
 
 -- (): boolean
 function isPlayerReeling()
+    RodName = getRodName()
     return LocalPlayer.Character:FindFirstChild(RodName).values.bite.Value
 end
 
