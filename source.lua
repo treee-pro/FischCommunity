@@ -1,9 +1,11 @@
 --[[
 
     Welcome to the Fisch Community script!
-    An open-source, community-maintained script. Feel free to contribute!
+    An open-source, community-maintained script.
 
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/treee-pro/FischCommunity/master/source'))()
+    Send a pull request to contribute!
+
+
 
 --]]
 
@@ -163,7 +165,7 @@ local FarmingSection = MainTab:CreateSection {
     Name = "Farming"
 }
 
-local AutoCastToggle = FarmingSection:AddToggle {
+FarmingSection:AddToggle {
     Name = "Auto Cast";
     Value = false;
     Callback = function(value)
@@ -172,7 +174,7 @@ local AutoCastToggle = FarmingSection:AddToggle {
     end
 }
 
-local AutoShakeToggle = FarmingSection:AddToggle {
+FarmingSection:AddToggle {
     Name = "Auto Shake";
     Value = false;
     Callback = function(value)
@@ -181,7 +183,7 @@ local AutoShakeToggle = FarmingSection:AddToggle {
     end
 }   
 
-local AutoReelToggle = FarmingSection:AddToggle {
+FarmingSection:AddToggle {
     Name = "Auto Reel";
     Value = false;
     Callback = function(value)
@@ -212,17 +214,24 @@ NPCs.ChildRemoved:Connect(function(child)
     end
 end)
 
-local SellAllButton = MerchantSection:AddButton {
+MerchantSection:AddButton {
     Name = "Sell All";
     Callback = function()
         Functions.SellEverything()
     end
 }
 
-local SellHandButton = MerchantSection:AddButton {
+MerchantSection:AddButton {
     Name = "Sell Hand";
     Callback = function()
         Functions.SellHand()
+    end
+}
+
+MerchantSection:AddButton {
+    Name = "Teleport to Merchant";
+    Callback = function()
+        LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = getNearestMerchant().HumanoidRootPart.CFrame
     end
 }
 
@@ -241,3 +250,50 @@ TeleportSection:AddDropdown {
     end
 }
 
+-- Player
+
+local PlayerSection = MainTab:CreateSection {
+    Name = "Player"
+}
+
+PlayerSection:AddSlider {
+    Name = "WalkSpeed";
+    Value = 16;
+    Min = 16;
+    Max = 100;
+    Textbox = true;
+    IllegalInput = true;
+    Callback = function(value)
+        LocalPlayer.Character:FindFirstChild("Humanoid").WalkSpeed = value
+    end
+}
+
+PlayerSection:AddToggle {
+    Name = "Anti Drown";
+    Value = false;
+    Callback = function(value)
+        LocalPlayer.Character.client.oxygen.Disabled = value
+    end
+}
+
+
+
+
+-- Other stuff
+
+-- Anti-AFK
+pcall(function()
+    for i,v in pairs(getconnections(Client.Idled)) do
+        v:Disable() 
+    end
+    Client.Idled:connect(function()
+        VirtualUser:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        VirtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    end)
+    while task.wait(300) do
+        VirtualUser:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        VirtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    end
+end)
