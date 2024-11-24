@@ -5,8 +5,6 @@
 
     Send a pull request to contribute!
 
-
-
 --]]
 
 local Config = {
