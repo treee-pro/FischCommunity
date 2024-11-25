@@ -89,3 +89,5 @@ function fc.getLibrary(name)
         end
     end
 end
+
+return fc
