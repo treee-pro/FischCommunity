@@ -6,7 +6,7 @@
 	Make a pull request to help update!
 
 	To use, 
-	local fc = loadstring(game:HttpGet('https://raw.githubusercontent.com/treee-pro/FischCommunity/main/source.lua'))()
+	local fc = loadstring(game:HttpGet('https://raw.githubusercontent.com/treee-pro/FischCommunity/refs/heads/main/source.lua'))()
 
 --]]
 
