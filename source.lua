@@ -1,15 +1,3 @@
---[[
-
-	Fisch Community
-	A community-maintained list of functions to assist script developers in Fisch
-
-	Make a pull request to help update!
-
-	To use, 
-	local fc = loadstring(game:HttpGet('https://raw.githubusercontent.com/treee-pro/FischCommunity/refs/heads/main/source.lua'))()
-
---]]
-
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer.PlayerGui
@@ -35,31 +23,36 @@ local fc = {}
 --]]
 
 -- gets player's rod instance
+-- rod(player: Player | LocalPlayer): Instance
 function fc.rod(player)
     player = player or LocalPlayer
     local rodName = ReplicatedStorage.playerstats[player.Name].Stats.rod.Value
     return player.Character:FindFirstChild(rodName)
 end
 
--- check if player is currently fishing (true when reeling and fishing)
+-- check if player is currently fishing (true when fishing and reeling)
+-- isFishing(player: Player | LocalPlayer): boolean
 function fc.isFishing(player)
-    player = player or LocalPlayer
-    return (fc.rod(player) and fc.rod(player):FindFirstChild("bobber")) and true or false
+    local rod = fc.rod(player or LocalPlayer)
+    return rod and rod.values.casted.Value or false
 end
 
--- check if player is currently reeling (true when reeling, false when fishing)
+-- check if player is currently reeling (false when fishing, true when reeling)
+-- isReeling(player: Player | LocalPlayer): boolean
 function fc.isReeling(player)
-    return (fc.rod(player).values.bite.Value) and true or false
+    local rod = fc.rod(player or LocalPlayer)
+    return rod and rod.values.bite.Value or false
 end
 
--- casts rod with options.distance
-function fc.cast(options)
-    options = options or {}
+-- casts rod at a distance
+-- cast(distance: number | 50): ()
+function fc.cast(distance)
     if fc.isFishing() then return end
-    fc.rod().events.cast:FireServer(options.distance or 0)
+    fc.rod().events.cast:FireServer(distance or 50)
 end
 
 -- shakes 1 time if isFishing == true
+-- shake(): ()
 function fc.shake()
     if not fc.isFishing() then return end
     pcall(function()
@@ -69,25 +62,45 @@ function fc.shake()
     end)
 end
 
--- instantly finishes reeling stage with options.accuracy, 100 being perfect catch
-function fc.finishReel(options)
-    options = options or {}
-    ReplicatedStorage.events.reelfinished:FireServer(options.accuracy or 100, true)
+-- instantly finishes reeling stage with accuracy, 100 being perfect catch
+-- finishReel(accuracy: number | 100): ()
+function fc.finishReel(accuracy)
+    ReplicatedStorage.events.reelfinished:FireServer(accuracy or 100, true)
 end
 
 --[[
-    debug
+    PLAYER
+    functions
 --]]
 
--- library modules store info on all fishes/items/locations/... in game
--- refer to "game.ReplicatedStorage.modules.library" to view all types of info stored
--- to use, getLibrary the name of any modulescript under this path, for example getLibrary("fish") returns a dictionary of fish info.
-function fc.getLibrary(name)
-    for _, mod in pairs(Library:GetDescendants()) do
-        if mod.Name == name then
-            return require(mod)
+-- gets player's equipped tools
+-- getEquippedTools(player: Player | LocalPlayer): {Instance, ...}?
+function fc.getEquippedTools(player)
+    player = player or LocalPlayer
+    local tools = {}
+    for _, child in player.Character:GetChildren() do
+        if child:IsA("Tool") then
+            table.insert(tools, child)
         end
     end
+    return tools
 end
 
-return fc
+--[[
+    TRADING
+    functions
+--]]
+
+-- offers held item to people (game has ~3s cooldown after offer is accepted)
+-- offerHand(to: player | LocalPlayer): ()
+function fc.offerHand(to)
+    local equippedTools = fc.getEquippedTools()
+    if #equippedTools ~= 1 then return error("not holding only 1 item") end
+
+    local equippedTool = equippedTools[1]
+    local offer = equippedTool:FindFirstChild("offer")
+
+    if not offer then return error("unofferable") end
+    
+    offer:FireServer(to or LocalPlayer)
+end
