@@ -1,3 +1,13 @@
+--[[
+	Fisch Community
+	A community-maintained list of functions to assist script developers in Fisch
+
+	Make a pull request to help update!
+
+	To use,
+	local fc = loadstring(game:HttpGet('https://raw.githubusercontent.com/treee-pro/FischCommunity/refs/heads/main/source.lua'))()
+--]]
+
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer.PlayerGui
@@ -104,3 +114,5 @@ function fc.offerHand(to)
     
     offer:FireServer(to or LocalPlayer)
 end
+
+return fc
